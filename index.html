@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Space Invaders</title>
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	<script type="text/javascript" src="spaceInvaders.js"></script>
+	<script type="text/javascript">
+
+		var game = null;
+		$(document).ready(function(){
+			game = new spaceInvaders();
+		});
+	</script>
+</head>
+<body>
+
+<div id="gameWindow">
+	<div id="welcome">
+		<h1>Space Invaders!</h1>
+		<a href="#">Play Game</a>
+	</div>
+	<div id="gamePlay">
+		<div id="sky">
+			<div id="mothership"></div>
+			<div id="aliens"></div>
+		</div>
+		<div id="ground">
+			<div id="buildings"></div>
+			<div id="fighter"></div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
