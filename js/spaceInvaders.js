@@ -29,14 +29,28 @@ spaceInvaders.prototype.init = function ()
 {
 	// set up the game
 	__this = this;
+	__this.welcomeScreen = $("#welcome");
+	__this.gameplayScreen = $("#gamePlay");
 	__this.sky = $("#sky");
 	__this.mothership = $("#mothership");
 	__this.aliens = $("#aliens");
 	__this.buildings = $("#buildings");
 	__this.ground = $("#ground");
 	__this.fighter = $("#fighter");
+	__this.playBtn = $("#playBtn");
+
+	__this.playBtn.click(function(){ __this.showGamePlay(); })
+
+}
+
+spaceInvaders.prototype.showGamePlay = function ()
+{
+	__this = this;
 
 	__this.addAliens();
+
+	__this.welcomeScreen.hide();
+	__this.gameplayScreen.show();
 }
 
 spaceInvaders.prototype.addAliens = function ()
@@ -47,6 +61,8 @@ spaceInvaders.prototype.addAliens = function ()
 		var newColumn = $('<div/>').addClass("alien-column");
 		for (var j = 0; j < __this.alienCounts[1]; j++) {
 			var newAlien = $('<div/>').addClass("alien");
+			var alienNum = Math.ceil(Math.random() * 3);
+			newAlien.addClass("alien"+alienNum);
 			newColumn.append(newAlien);
 		}
 		__this.aliens.append(newColumn);

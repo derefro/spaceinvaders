@@ -22,7 +22,6 @@ body {
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	display: none;
 }
 
 #welcome h1 {
@@ -43,6 +42,16 @@ body {
 	margin-top: 300px;
 }
 
+#gamePlay {
+	width: 100%;
+	height: 100%;
+	float: left;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	display: none;
+}
+
 #aliens {
 	width: 100%;
 	height: 100%;
@@ -57,9 +66,17 @@ body {
 }
 
 #aliens .alien-column .alien {
-	background: #ff0000;
 	width: 60px;
 	height: 60px;
 	float: left;
 	margin: 4px;
+}
+#aliens .alien-column .alien.alien1 {
+	background: #ff0000;
+}
+#aliens .alien-column .alien.alien2 {
+	background: #00ff00;
+}
+#aliens .alien-column .alien.alien3 {
+	background: #0000ff;
 }
