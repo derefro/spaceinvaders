@@ -14,7 +14,10 @@ spaceInvaders = function ()
 	this.welcomeScreen;
 	this.gameplayScreen;
 
+	this.currentScore = 0;
+
 	// these will hold the objects later
+	this.pointsBlock;
 	this.sky;
 	this.mothership;
 	this.aliens;
@@ -31,6 +34,7 @@ spaceInvaders.prototype.init = function ()
 	__this = this;
 	__this.welcomeScreen = $("#welcome");
 	__this.gameplayScreen = $("#gamePlay");
+	__this.pointsBlock = $("#points");
 	__this.sky = $("#sky");
 	__this.mothership = $("#mothership");
 	__this.aliens = $("#aliens");
@@ -48,9 +52,64 @@ spaceInvaders.prototype.showGamePlay = function ()
 	__this = this;
 
 	__this.addAliens();
-
+	__this.currentScore = 0;
+	__this.updateScore(0);
+	__this.addGameListeners();
 	__this.welcomeScreen.hide();
 	__this.gameplayScreen.show();
+}
+
+spaceInvaders.prototype.updateScore = function(points)
+{
+	__this = this;
+	__this.currentScore += points;
+	__this.pointsBlock.text(__this.currentScore);
+}
+
+spaceInvaders.prototype.addGameListeners = function()
+{
+	__this = this;
+
+	$(document).keydown($.proxy(__this.keydownListener, __this));
+	$(document).keyup($.proxy(__this.keyupListener, __this));
+}
+
+spaceInvaders.prototype.keydownListener = function(event)
+{
+	__this = this;
+	event.preventDefault;
+	if(event.which == 32)
+	{
+		// fire missile
+	}
+	if(event.which == 37)
+	{
+		__this.fighter.css("left","-="+__this.fighterMoveSpeed+"px");
+	}
+	if(event.which == 39)
+	{
+		__this.fighter.css("left","+="+__this.fighterMoveSpeed+"px");
+	}
+}
+
+spaceInvaders.prototype.keyupListener = function(event)
+{
+	__this = this;
+	event.preventDefault;
+	if(event.which == 32)
+	{
+		// stop missile
+	}
+	if(event.which == 37)
+	{
+		// stop moveLeft
+	}
+	if(event.which == 39)
+	{
+		// stop moveRight
+	}
+
+	
 }
 
 spaceInvaders.prototype.addAliens = function ()
