@@ -9,7 +9,7 @@ body {
 
 #gameWindow {
 	width: 800px;
-	height: 600px;
+	height: 800px;
 	margin: 0px auto;
 	position: relative;
 }
@@ -67,19 +67,19 @@ body {
 
 #aliens .alien-column .alien {
 	background: url("../img/aliens.gif") no-repeat;
-	width: 100px;
+	width: 86px;
 	height: 60px;
 	float: left;
 	margin: 4px;
 }
 #aliens .alien-column .alien.alien1 {
-	background-position: 0px 0px;
+	background-position: -9px 0px;
 }
 #aliens .alien-column .alien.alien2 {
-	background-position: -100px 0px;
+	background-position: -116px 0px;
 }
 #aliens .alien-column .alien.alien3 {
-	background-position: -200px 0px;
+	background-position: -215px 0px;
 }
 
 #ground {
