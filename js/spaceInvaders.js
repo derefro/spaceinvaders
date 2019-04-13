@@ -5,6 +5,7 @@ spaceInvaders = function ()
 	this.alienCounts = [8,5];
 	// how many buildings
 	this.buildingCounts = 4;
+	this.buildingParts = 12;
 
 	this.fighterMoveSpeed = 5;
 	this.fighterShootDelay = 5;
@@ -52,6 +53,7 @@ spaceInvaders.prototype.showGamePlay = function ()
 	__this = this;
 
 	__this.addAliens();
+	__this.addBuildings();
 	__this.currentScore = 0;
 	__this.updateScore(0);
 	__this.addGameListeners();
@@ -131,4 +133,13 @@ spaceInvaders.prototype.addAliens = function ()
 spaceInvaders.prototype.addBuildings = function ()
 {
 	__this = this;
+
+	for (var i = 0; i < __this.buildingCounts; i++) {
+		var newBuilding = $('<div/>').addClass("building");
+		for (var j = 0; j < __this.buildingParts; j++) {
+			var newBuildingPart = $('<div/>').addClass("building-part damage0 part"+j).data('damage',0);
+			newBuilding.append(newBuildingPart);
+		}
+		__this.buildings.append(newBuilding);
+	}
 }
