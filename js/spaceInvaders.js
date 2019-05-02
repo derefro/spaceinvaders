@@ -12,7 +12,7 @@ spaceInvaders = function ()
 	this.aliensMoveDelay = 1000;
 	this.fighterMoveSpeed = 2;
 	this.fighterMoveDelay = 5;
-	this.fighterShootDelay = 5;
+	this.fighterShootDelay = 50;
 	this.shotSpeed = 5;
 
 	this.welcomeScreen;
@@ -25,6 +25,7 @@ spaceInvaders = function ()
 	this.fighterMoveInterval;
 	this.fighterWidth;
 	this.fighterLeftPosition;
+	this.missileInterval;
 
 	this.aliensMoveInterval;
 	this.aliensWidth;
@@ -107,7 +108,8 @@ spaceInvaders.prototype.keydownListener = function(event)
 	event.preventDefault;
 	if(event.which == 32)
 	{
-		// fire missile
+		clearInterval(__this.missileInterval);
+		__this.missileInterval = setInterval(function(){ __this.fireMissile(); }, __this.fighterShootDelay);
 	}
 	if(event.which == 37)
 	{
@@ -119,6 +121,7 @@ spaceInvaders.prototype.keydownListener = function(event)
 		clearInterval(__this.fighterMoveInterval);
 		__this.fighterMoveInterval = setInterval(function(){ __this.moveFighter("right") },__this.fighterMoveDelay)
 	}
+	return false;
 }
 
 spaceInvaders.prototype.keyupListener = function(event)
@@ -127,7 +130,7 @@ spaceInvaders.prototype.keyupListener = function(event)
 	event.preventDefault;
 	if(event.which == 32)
 	{
-		// stop missile
+		clearInterval(__this.missileInterval);
 	}
 	if(event.which == 37)
 	{
@@ -138,7 +141,7 @@ spaceInvaders.prototype.keyupListener = function(event)
 		clearInterval(__this.fighterMoveInterval);
 	}
 
-
+	return false;
 }
 
 spaceInvaders.prototype.moveFighter = function (direction)
@@ -234,3 +237,18 @@ spaceInvaders.prototype.addBuildings = function ()
 		__this.buildings.append(newBuilding);
 	}
 }
+
+
+spaceInvaders.prototype.fireMissile = function ()
+{
+	__this = this;
+
+	var fighterPosition = __this.fighter.position();
+
+	var newMissile = $('<div/>').addClass('missile');
+	newMissile.css({"top":fighterPosition.top+"px","left":fighterPosition.left+(__this.fighterWidth/2)+"px"});
+	__this.gameplayScreen.append(newMissile);
+
+	
+}
+

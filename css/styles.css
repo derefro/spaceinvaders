@@ -130,3 +130,14 @@ body {
 	left: 350px;
 	bottom: 0px;
 }
+
+.missile {
+	background: #ffffff;
+	width: 5px;
+	height: 15px;
+	float: left;
+	position: absolute;
+	z-index: 100;
+}
+
+
