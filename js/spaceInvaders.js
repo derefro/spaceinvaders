@@ -12,8 +12,9 @@ spaceInvaders = function ()
 	this.aliensMoveDelay = 1000;
 	this.fighterMoveSpeed = 2;
 	this.fighterMoveDelay = 5;
-	this.fighterShootDelay = 50;
-	this.shotSpeed = 5;
+	this.fighterShootDelay = 500;
+	this.shotSpeed = 850;
+	this.firing = false;
 
 	this.welcomeScreen;
 	this.gameplayScreen;
@@ -32,6 +33,8 @@ spaceInvaders = function ()
 	this.aliensHeight;
 	this.aliensLeftPosition;
 	this.aliensTopPosition = 0;
+
+	this.alienColumns = [];
 
 	// these will hold the objects later
 	this.pointsBlock;
@@ -108,20 +111,24 @@ spaceInvaders.prototype.keydownListener = function(event)
 	event.preventDefault;
 	if(event.which == 32)
 	{
-		clearInterval(__this.missileInterval);
+		if(__this.firing==true) return false;
+		__this.fireMissile();
+		__this.firing = true;
 		__this.missileInterval = setInterval(function(){ __this.fireMissile(); }, __this.fighterShootDelay);
+		return false;
 	}
 	if(event.which == 37)
 	{
 		clearInterval(__this.fighterMoveInterval);
 		__this.fighterMoveInterval = setInterval(function(){ __this.moveFighter("left") },__this.fighterMoveDelay)
+		return false;
 	}
 	if(event.which == 39)
 	{
 		clearInterval(__this.fighterMoveInterval);
 		__this.fighterMoveInterval = setInterval(function(){ __this.moveFighter("right") },__this.fighterMoveDelay)
+		return false;
 	}
-	return false;
 }
 
 spaceInvaders.prototype.keyupListener = function(event)
@@ -131,17 +138,20 @@ spaceInvaders.prototype.keyupListener = function(event)
 	if(event.which == 32)
 	{
 		clearInterval(__this.missileInterval);
+		__this.firing = false;
+		return false;
 	}
 	if(event.which == 37)
 	{
 		clearInterval(__this.fighterMoveInterval);
+		return false;
 	}
 	if(event.which == 39)
 	{
 		clearInterval(__this.fighterMoveInterval);
+		return false;
 	}
 
-	return false;
 }
 
 spaceInvaders.prototype.moveFighter = function (direction)
@@ -203,6 +213,10 @@ spaceInvaders.prototype.moveAliens = function (direction)
 		}
 	}
 
+	for (var i = 0; i < __this.alienCounts[0]; i++) {
+		__this.alienColumns[i] = ((__this.aliensWidth * .125) * i) + __this.aliensLeftPosition;
+	}
+
 }
 
 spaceInvaders.prototype.addAliens = function ()
@@ -248,7 +262,39 @@ spaceInvaders.prototype.fireMissile = function ()
 	var newMissile = $('<div/>').addClass('missile');
 	newMissile.css({"top":fighterPosition.top+"px","left":fighterPosition.left+(__this.fighterWidth/2)+"px"});
 	__this.gameplayScreen.append(newMissile);
+	$(newMissile).animate({"top":"-20px"},{
+		duration: __this.shotSpeed,
+		easing: "linear",
+		step: function(){ __this.alienHitTest(this); },
+		complete:function(){ $(this).remove(); },
+	});
 
-	
+
 }
 
+spaceInvaders.prototype.alienHitTest = function (missile)
+{
+	__this = this;
+	var missilePosition = $(missile).position();
+	if(missilePosition.left < __this.aliensLeftPosition
+		|| missilePosition.left > (__this.aliensLeftPosition + __this.aliensWidth)
+		|| missilePosition.top > (__this.aliensTopPosition + __this.aliensHeight)
+		|| missilePosition.top < __this.aliensTopPosition)
+		return false;
+
+	var whichHit = 0;
+	for (var i = 0; i < __this.alienCounts[0]; i++) {
+		if(missilePosition.left > __this.alienColumns[i]) whichHit = i;
+		else break;
+	}
+	var hitColumn = __this.aliens.find(".alien-column")[whichHit];
+	$(hitColumn).find(".alien").each(function(index,element) {
+		var alienPosition = $(element).position();
+		var alienHeight = $(element).height();
+		if(missilePosition.top > alienPosition.top && missilePosition.top < (alienPosition.top + alienHeight))
+		{
+			$(missile).stop(false,false).remove();
+			$(element).remove();
+		}
+	});
+}

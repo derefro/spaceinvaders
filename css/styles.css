@@ -120,7 +120,7 @@ body {
 	margin: 0px 40px;
 }
 
-#ground #fighter {
+#fighter {
 	background: url(../img/fighter.png) center center no-repeat;
 	width: 100px;
 	height: 50px;
