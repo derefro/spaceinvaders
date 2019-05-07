@@ -365,6 +365,7 @@ spaceInvaders.prototype.resetGame = function (result)
 	__this.buildings.empty();
 	__this.aliensLeftPosition = 0;
 	__this.aliensTopPosition = 0;
+	__this.aliensLeft = 0;
 	__this.aliens.css({"top": __this.aliensTopPosition+"px","left": __this.aliensLeftPosition+"px"});
 	__this.addAliens();
 	__this.addBuildings();
