@@ -203,8 +203,13 @@ body {
 	width: 120px;
 	height: 120px;
 	float: left;
-	margin: 0px 40px;
+	position: absolute;
+	top: 0px;
 }
+#ground #buildings .building.damage0 { background-position: 0px 0px; }
+#ground #buildings .building.damage1 { background-position: -120px 0px; }
+#ground #buildings .building.damage2 { background-position: -240px 0px; }
+#ground #buildings .building.damage3 { background-position: -360px 0px; }
 
 #fighter {
 	background: url(../img/fighter.png) center center no-repeat;
@@ -221,6 +226,17 @@ body {
 	background: #ffffff;
 	width: 5px;
 	height: 15px;
+	float: left;
+	position: absolute;
+	z-index: 100;
+}
+
+
+.bomb {
+	background: #ffffff;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
 	float: left;
 	position: absolute;
 	z-index: 100;

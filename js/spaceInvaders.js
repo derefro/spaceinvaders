@@ -6,6 +6,9 @@ spaceInvaders = function ()
 	// how many buildings
 	this.buildingCounts = 4;
 	this.buildingParts = 12;
+	this.buildingWidth = 120;
+	this.buildingMaxDamage = 4;
+	this.buildingsLeft = 0;
 
 	this.aliensMoveSpeed = 10;
 	this.aliensDropSpeed = 15;
@@ -22,11 +25,13 @@ spaceInvaders = function ()
 	this.gameLoseScreen;
 
 	this.gameplayScreenWidth;
+	this.gameplayScreenHeight;
 
 	this.currentScore = 0;
 
 	this.fighterMoveInterval;
 	this.fighterWidth;
+	this.fighterHeight;
 	this.fighterLeftPosition;
 	this.missileInterval;
 
@@ -36,9 +41,16 @@ spaceInvaders = function ()
 	this.aliensLeftPosition = 0;
 	this.aliensTopPosition = 0;
 
+	this.alienBombMinDelay = 500;
+	this.alienBombMaxDelay = 100;
+	this.bombSpeed = 1000;
+	this.bombTimeout;
+
 	this.alienColumns = [];
 	this.aliensLeft = 0;
 
+	this.groundWidth;
+	this.groundHeight;
 	this.groundPosition;
 
 	this.pointsPerHit = 100;
@@ -74,9 +86,11 @@ spaceInvaders.prototype.init = function ()
 	__this.playAgainBtns = $(".playAgainBtn");
 
 	__this.gameplayScreenWidth = __this.gameplayScreen.width();
+	__this.gameplayScreenHeight = __this.gameplayScreen.height();
 
 
 	__this.fighterWidth = __this.fighter.width();
+	__this.fighterHeight = __this.fighter.height();
 	__this.fighterLeftPosition = ( __this.gameplayScreenWidth / 2 ) - ( __this.fighterWidth / 2 );
 	__this.fighter.css('left',__this.fighterLeftPosition+"px");
 
@@ -89,14 +103,16 @@ spaceInvaders.prototype.showGamePlay = function ()
 {
 	__this = this;
 
+	__this.gameplayScreen.show();
+	__this.groundWidth = __this.ground.width();
+	__this.groundHeight = __this.ground.height();
+	__this.groundPosition = __this.ground.position();
 	__this.addAliens();
 	__this.addBuildings();
 	__this.currentScore = 0;
 	__this.updateScore(0);
 	__this.addGameListeners();
 	__this.welcomeScreen.hide();
-	__this.gameplayScreen.show();
-	__this.groundPosition = __this.ground.position();
 
 }
 
@@ -115,7 +131,7 @@ spaceInvaders.prototype.addGameListeners = function()
 	$(document).keyup($.proxy(__this.keyupListener, __this));
 
 	__this.aliensMoveInterval = setInterval(function(){ __this.moveAliens("right"); },__this.aliensMoveDelay);
-
+	__this.bombTimeout = setTimeout(function(){ __this.dropBomb(); },(__this.alienBombMinDelay+__this.alienBombMaxDelay));
 }
 
 spaceInvaders.prototype.removeGameListeners = function()
@@ -126,6 +142,7 @@ spaceInvaders.prototype.removeGameListeners = function()
 	$(document).unbind("keyup");
 
 	clearInterval(__this.aliensMoveInterval);
+	clearTimeout(__this.bombTimeout);
 
 }
 
@@ -272,14 +289,16 @@ spaceInvaders.prototype.addAliens = function ()
 spaceInvaders.prototype.addBuildings = function ()
 {
 	__this = this;
-
+	var buildingSpacing = ((__this.groundWidth - (__this.buildingWidth * __this.buildingCounts)) / __this.buildingCounts) / 2;
 	for (var i = 0; i < __this.buildingCounts; i++) {
-		var newBuilding = $('<div/>').addClass("building");
-		for (var j = 0; j < __this.buildingParts; j++) {
-			var newBuildingPart = $('<div/>').addClass("building-part damage0 part"+j).data('damage',0);
-			newBuilding.append(newBuildingPart);
-		}
+		var leftSpace = buildingSpacing + (i * (buildingSpacing * 2)) + (i * __this.buildingWidth);
+		var newBuilding = $('<div/>').addClass("building damage0").css("left",leftSpace+"px").data('damage',0);
+		// for (var j = 0; j < __this.buildingParts; j++) {
+		// 	var newBuildingPart = $('<div/>').addClass("building-part damage0 part"+j).data('damage',0);
+		// 	newBuilding.append(newBuildingPart);
+		// }
 		__this.buildings.append(newBuilding);
+		__this.buildingsLeft++;
 	}
 }
 
@@ -336,6 +355,90 @@ spaceInvaders.prototype.alienHitTest = function (missile)
 	});
 }
 
+
+spaceInvaders.prototype.dropBomb = function ()
+{
+	__this = this;
+
+	var fighterPosition = __this.fighter.position();
+
+	var whichColumn = __this.aliens.find(".alien-column")[(Math.floor(Math.random() * __this.alienCounts[0]))];
+	var alienList = $(whichColumn).find(".alien");
+	if(alienList.length > 0)
+	{
+		var thisAlien = alienList.last();
+		var thisAlienPosition = thisAlien.position();
+		var thisAlienWidth = thisAlien.width();
+		var newBomb = $('<div/>').addClass('bomb');
+		newBomb.css({"top":(thisAlienPosition.top + __this.aliensTopPosition)+"px","left":thisAlienPosition.left+(thisAlienWidth/2)+"px"});
+		__this.gameplayScreen.append(newBomb);
+		$(newBomb).animate({"top":__this.gameplayScreenHeight+"px"},{
+			duration: __this.bombSpeed,
+			easing: "linear",
+			progress: function(){ __this.bombHitTest(this); },
+			complete:function(){ $(this).remove(); },
+		});
+	}
+	__this.bombTimeout = setTimeout(function(){ __this.dropBomb(); },(__this.alienBombMinDelay+(Math.random() * __this.alienBombMaxDelay)));
+
+
+
+}
+
+spaceInvaders.prototype.bombHitTest = function (bomb)
+{
+	__this = this;
+	var bombPosition = $(bomb).position();
+	if(bombPosition.left < __this.groundPosition.left
+		|| bombPosition.left > (__this.groundPosition.left + __this.groundWidth)
+		|| bombPosition.top > (__this.groundPosition.top + __this.groundHeight)
+		|| bombPosition.top < __this.groundPosition.top)
+		return false;
+	__this.buildings.find(".building").each(function(index,element) {
+		var buildingPosition = $(element).position();
+		var buildingHeight = $(element).height();
+		var buildingWidth = $(element).width();
+		if(bombPosition.top > (__this.groundPosition.top + buildingPosition.top)
+		 && bombPosition.top < (__this.groundPosition.top + buildingPosition.top + buildingHeight)
+		 && bombPosition.left > buildingPosition.left
+		 && bombPosition.left < (buildingPosition.left + buildingWidth))
+		{
+			$(bomb).stop(false,false).remove();
+			var currentDamage = $(element).data("damage");
+			$(element).removeClass("damage"+currentDamage);
+			currentDamage++;
+			if(currentDamage >= __this.buildingMaxDamage)
+			{
+				$(element).stop(true,false).remove();
+				__this.buildingsLeft--;
+			}
+			else
+			{
+				$(element).data("damage",currentDamage);
+				$(element).addClass("damage"+currentDamage);
+			}
+			if(__this.buildingsLeft==0)
+			{
+				__this.gameOver("lose");
+			}
+			return false;
+		}
+	});
+
+	var fighterPosition = __this.fighter.position();
+
+	if(bombPosition.top > (fighterPosition.top)
+	 && bombPosition.top < (fighterPosition.top + __this.fighterHeight)
+	 && bombPosition.left > fighterPosition.left
+	 && bombPosition.left < (fighterPosition.left + __this.fighterWidth))
+	{
+		$(bomb).stop(false,false).remove();
+		__this.gameOver("lose");
+		return false;
+	}
+
+}
+
 spaceInvaders.prototype.gameOver = function (result)
 {
 	__this = this;
@@ -366,6 +469,7 @@ spaceInvaders.prototype.resetGame = function (result)
 	__this.aliensLeftPosition = 0;
 	__this.aliensTopPosition = 0;
 	__this.aliensLeft = 0;
+	__this.buildingsLeft = 0;
 	__this.aliens.css({"top": __this.aliensTopPosition+"px","left": __this.aliensLeftPosition+"px"});
 	__this.addAliens();
 	__this.addBuildings();
